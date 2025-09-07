@@ -1,31 +1,41 @@
-// server.js — 323cosmetics backend
+// cosmetics.js — 323cosmetics frontend logic
 
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
+document.addEventListener("DOMContentLoaded", () => {
+  const API_BASE = ""; // same origin, since server.js and index.html are served together
+  const container = document.getElementById("trend");
 
-const app = express();
-app.use(cors());
+  function ts() {
+    return new Date().toLocaleTimeString([], { hour12: false });
+  }
 
-// serve index.html
-app.use(express.static(path.join(__dirname)));
+  function line(msg) {
+    const p = document.createElement("p");
+    p.innerHTML = `<span>[${ts()}]</span> ${msg}`;
+    container.appendChild(p);
+  }
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  async function loadTrend() {
+    try {
+      line("📡 Fetching 323cosmetics trend…");
+      const r = await fetch(`${API_BASE}/api/trend`, { cache: "no-store" });
+      const j = await r.json();
+
+      container.innerHTML = `
+        <div class="card">
+          <h2>${j.brand}</h2>
+          <p><strong>Product:</strong> ${j.product}</p>
+          <p><strong>Gender:</strong> ${j.gender}</p>
+          <p><strong>Description:</strong> ${j.description}</p>
+          <div>
+            ${(j.hashtags || []).map(h => `<span class="badge">${h}</span>`).join(" ")}
+          </div>
+        </div>
+      `;
+    } catch (e) {
+      container.innerHTML = `<p style="color:red">❌ Failed to load trend.</p>`;
+      console.error(e);
+    }
+  }
+
+  loadTrend();
 });
-
-// API stubs
-app.get("/api/trend", (req, res) => {
-  res.json({
-    brand: "323cosmetics",
-    product: "Peptide Lip Tint",
-    gender: "female",
-    description: "Example description...",
-    hashtags: ["#TikTokMadeMeBuyIt", "#BeautyTok", "#NowTrending"]
-  });
-});
-
-app.get("/health", (_req, res) => res.json({ ok: true, time: Date.now() }));
-
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log("323cosmetics backend on port", PORT));
