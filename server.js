@@ -1,4 +1,4 @@
-// female.js — 323drop Live (Female-Only Mode, TikTok Cosmetics Top 50)
+// server.js — 323drop Live (Female-Only Mode, TikTok Cosmetics Top 50)
 // Node >= 20, CommonJS
 
 const express = require("express");
@@ -156,7 +156,6 @@ function pickProductAlgorithm() {
   return pool[idx];
 }
 
-// ✅ Generate product-specific image prompt
 function stylizedPrompt(brand, product) {
   let action = "holding the product";
   const lower = product.toLowerCase();
@@ -196,7 +195,6 @@ async function generateImageUrl(brand, product) {
   return "https://placehold.co/600x600?text=No+Image";
 }
 
-/* ---------------- Pre-gen ---------------- */
 async function generateNextPick() {
   if (generatingNext) return;
   generatingNext = true;
@@ -234,7 +232,6 @@ app.get("/api/trend", async (req, res) => {
       console.log("⏳ First drop generating…");
       await generateNextPick();
     }
-
     const result = nextPickCache || {
       brand: "Loading",
       product: "Beauty Product",
@@ -245,10 +242,8 @@ app.get("/api/trend", async (req, res) => {
       voice: null,
       refresh: 5000
     };
-
     nextPickCache = null;
-    generateNextPick(); // pre-gen next in background
-
+    generateNextPick();
     res.json(result);
   } catch (e) {
     console.error("❌ Trend API error:", e);
@@ -269,7 +264,6 @@ app.get("/api/voice", async (req, res) => {
   try {
     const text = req.query.text || "";
     if (!text) return res.status(400).json({ error: "Missing text" });
-
     let audioBuffer = await googleTTS(text);
     if (!audioBuffer) audioBuffer = await openaiTTS(text);
     if (!audioBuffer) return res.status(500).json({ error: "No audio generated" });
@@ -278,22 +272,11 @@ app.get("/api/voice", async (req, res) => {
   } catch (e) { res.status(500).json({ error: "Voice TTS failed" }); }
 });
 
-app.get("/api/test-google", async (req, res) => {
-  try {
-    const text = "Google TTS is working. Hello from 323drop female cosmetics mode!";
-    let audioBuffer = await googleTTS(text);
-    if (!audioBuffer) audioBuffer = await openaiTTS(text);
-    if (!audioBuffer) return res.status(500).json({ error: "No audio generated" });
-    res.setHeader("Content-Type", "audio/mpeg");
-    res.send(audioBuffer);
-  } catch (e) { res.status(500).json({ error: "Test TTS failed" }); }
-});
-
 app.get("/health", (_req,res) => res.json({ ok: true, time: Date.now() }));
 
 /* ---------------- Start ---------------- */
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, async () => {
   console.log(`323drop live backend (female-only, TikTok Cosmetics Top 50) on :${PORT}`);
-  await generateNextPick(); // ✅ Pre-warm first drop
+  await generateNextPick();
 });
