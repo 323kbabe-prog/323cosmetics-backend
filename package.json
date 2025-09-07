@@ -1,10 +1,10 @@
 {
-  "name": "323drop-female-backend",
+  "name": "323cosmetics-backend",
   "version": "1.0.0",
   "description": "323drop Live backend (Female-only mode, TikTok Cosmetics Top 50)",
-  "main": "female.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node female.js"
+    "start": "node server.js"
   },
   "engines": {
     "node": ">=20"
