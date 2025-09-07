@@ -47,7 +47,6 @@ async function googleTTS(text) {
   }
 }
 
-/* ---------------- OpenAI fallback TTS ---------------- */
 async function openaiTTS(text) {
   try {
     const out = await openai.audio.speech.create({
@@ -124,13 +123,10 @@ const TOP50_COSMETICS = [
 /* ---------------- Helpers ---------------- */
 async function makeFirstPersonDescription(brand, product) {
   try {
-    console.log("📝 Generating description for:", brand, product);
     const prompt = `
       Write a minimum 70-word first-person description of using "${product}" by ${brand}.
-      Speak as if I’m applying the product myself. 
-      Make it sensory (how it feels, looks, and the vibe), Gen-Z relatable, and authentic.
-      Add a slightly different perspective or vibe each time so no two outputs are identical.
-      Current time: ${new Date().toISOString()}.
+      Speak as if I’m applying the product myself.
+      Make it sensory, Gen-Z relatable, and authentic.
     `;
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -143,7 +139,7 @@ async function makeFirstPersonDescription(brand, product) {
     return completion.choices[0].message.content.trim();
   } catch (e) {
     console.error("❌ Description failed:", e.message);
-    return `Using ${product} by ${brand} feels unforgettable, refreshing, and addictive.`;
+    return `Using ${product} by ${brand} feels unforgettable and addictive.`;
   }
 }
 
@@ -152,37 +148,15 @@ function pickProductAlgorithm() {
   const weightTop = 0.7;
   let pool = Math.random() < weightTop ? femalePool.slice(0, 20) : femalePool.slice(20);
   if (!pool.length) pool = femalePool;
-  const idx = Math.floor(Math.random() * pool.length);
-  return pool[idx];
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
-// ✅ Generate product-specific image prompt
 function stylizedPrompt(brand, product) {
-  let action = "holding the product";
-  const lower = product.toLowerCase();
-  if (lower.includes("lip")) action = "applying lip product";
-  else if (lower.includes("mascara") || lower.includes("eye") || lower.includes("brow")) action = "applying eye makeup";
-  else if (lower.includes("cream") || lower.includes("serum") || lower.includes("toner") || lower.includes("mask")) action = "applying skincare to face";
-  else if (lower.includes("hair") || lower.includes("spray")) action = "using haircare product";
-
-  return [
-    "Create a high-impact, shareable photocard-style image.",
-    "Subject: young female Korean idol (Gen-Z aesthetic).",
-    `She is ${action}.`,
-    "Make an ORIGINAL idol-like face and styling; do NOT replicate real celebrities.",
-    "No text, logos, or watermarks.",
-    "Square 1:1 composition.",
-    "• pastel gradient background (milk pink, baby blue, lilac)",
-    "• glitter bokeh and lens glints",
-    "• flash-lit glossy skin with subtle K-beauty glow",
-    "• sticker shapes ONLY (hearts, stars, sparkles) floating lightly",
-    "• clean studio sweep look; subtle film grain"
-  ].join(" ");
+  return `Create a photocard of a young female Korean idol using ${product} by ${brand}, pastel background, K-beauty glow, no logos.`;
 }
 
 async function generateImageUrl(brand, product) {
   try {
-    console.log("🎨 Generating female idol image with:", brand, product);
     const out = await openai.images.generate({
       model: "gpt-image-1", prompt: stylizedPrompt(brand, product), size: "1024x1024"
     });
@@ -190,13 +164,11 @@ async function generateImageUrl(brand, product) {
     if (d?.b64_json) return `data:image/png;base64,${d.b64_json}`;
     if (d?.url) return d.url;
   } catch (e) {
-    lastImgErr = { message: e?.message || String(e) };
-    console.error("❌ Image gen error:", lastImgErr);
+    console.error("❌ Image gen error:", e.message);
   }
   return "https://placehold.co/600x600?text=No+Image";
 }
 
-/* ---------------- Pre-gen ---------------- */
 async function generateNextPick() {
   if (generatingNext) return;
   generatingNext = true;
@@ -209,10 +181,7 @@ async function generateNextPick() {
     if (!audioBuffer) audioBuffer = await openaiTTS(description);
 
     let voiceBase64 = null;
-    if (audioBuffer) {
-      console.log("✅ Female voice generated (bytes:", audioBuffer.length, ")");
-      voiceBase64 = `data:audio/mpeg;base64,${audioBuffer.toString("base64")}`;
-    }
+    if (audioBuffer) voiceBase64 = `data:audio/mpeg;base64,${audioBuffer.toString("base64")}`;
 
     nextPickCache = {
       brand: pick.brand,
@@ -224,76 +193,36 @@ async function generateNextPick() {
       voice: voiceBase64,
       refresh: voiceBase64 ? 3000 : null
     };
-  } finally { generatingNext = false; }
+  } finally {
+    generatingNext = false;
+  }
 }
 
-/* ---------------- API Routes ---------------- */
+/* ---------------- API ---------------- */
 app.get("/api/trend", async (req, res) => {
-  try {
-    if (!nextPickCache) {
-      console.log("⏳ First drop generating…");
-      await generateNextPick();
-    }
-
-    const result = nextPickCache || {
-      brand: "Loading",
-      product: "Beauty Product",
-      gender: "female",
-      description: "AI is warming up… please wait.",
-      hashtags: ["#BeautyTok"],
-      image: "https://placehold.co/600x600?text=Loading",
-      voice: null,
-      refresh: 5000
-    };
-
-    nextPickCache = null;
-    generateNextPick(); // pre-gen next in background
-
-    res.json(result);
-  } catch (e) {
-    console.error("❌ Trend API error:", e);
-    res.json({
-      brand: "Error",
-      product: "System",
-      gender: "female",
-      description: "Something went wrong. Retrying soon…",
-      hashtags: ["#Error"],
-      image: "https://placehold.co/600x600?text=Error",
-      voice: null,
-      refresh: 5000
-    });
-  }
+  if (!nextPickCache) await generateNextPick();
+  const result = nextPickCache;
+  nextPickCache = null;
+  generateNextPick();
+  res.json(result);
 });
 
 app.get("/api/voice", async (req, res) => {
-  try {
-    const text = req.query.text || "";
-    if (!text) return res.status(400).json({ error: "Missing text" });
+  const text = req.query.text || "";
+  if (!text) return res.status(400).json({ error: "Missing text" });
 
-    let audioBuffer = await googleTTS(text);
-    if (!audioBuffer) audioBuffer = await openaiTTS(text);
-    if (!audioBuffer) return res.status(500).json({ error: "No audio generated" });
-    res.setHeader("Content-Type", "audio/mpeg");
-    res.send(audioBuffer);
-  } catch (e) { res.status(500).json({ error: "Voice TTS failed" }); }
+  let audioBuffer = await googleTTS(text);
+  if (!audioBuffer) audioBuffer = await openaiTTS(text);
+  if (!audioBuffer) return res.status(500).json({ error: "No audio generated" });
+  res.setHeader("Content-Type", "audio/mpeg");
+  res.send(audioBuffer);
 });
 
-app.get("/api/test-google", async (req, res) => {
-  try {
-    const text = "Google TTS is working. Hello from 323drop female cosmetics mode!";
-    let audioBuffer = await googleTTS(text);
-    if (!audioBuffer) audioBuffer = await openaiTTS(text);
-    if (!audioBuffer) return res.status(500).json({ error: "No audio generated" });
-    res.setHeader("Content-Type", "audio/mpeg");
-    res.send(audioBuffer);
-  } catch (e) { res.status(500).json({ error: "Test TTS failed" }); }
-});
-
-app.get("/health", (_req,res) => res.json({ ok: true, time: Date.now() }));
+app.get("/health", (_req, res) => res.json({ ok: true, time: Date.now() }));
 
 /* ---------------- Start ---------------- */
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, async () => {
-  console.log(`323drop live backend (female-only, TikTok Cosmetics Top 50) on :${PORT}`);
-  await generateNextPick(); // ✅ Pre-warm first drop
+  console.log(`✅ 323drop backend running on :${PORT}`);
+  await generateNextPick();
 });
