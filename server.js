@@ -156,6 +156,7 @@ function pickProductAlgorithm() {
   return pool[idx];
 }
 
+/* ---------------- Stylized prompt (improved) ---------------- */
 function stylizedPrompt(brand, product) {
   let action = "holding the product";
   const lower = product.toLowerCase();
@@ -167,7 +168,8 @@ function stylizedPrompt(brand, product) {
   return [
     "Create a high-impact, shareable photocard-style image.",
     "Subject: young female Korean idol (Gen-Z aesthetic).",
-    `She is ${action}.`,
+    `She is visibly ${action}, clearly holding the ${product} by ${brand} and using it in the scene.`,
+    "The product must be obvious and actively in use, not just floating or implied.",
     "Make an ORIGINAL idol-like face and styling; do NOT replicate real celebrities.",
     "No text, logos, or watermarks.",
     "Square 1:1 composition.",
@@ -183,7 +185,9 @@ async function generateImageUrl(brand, product) {
   try {
     console.log("🎨 Generating female idol image with:", brand, product);
     const out = await openai.images.generate({
-      model: "gpt-image-1", prompt: stylizedPrompt(brand, product), size: "1024x1024"
+      model: "gpt-image-1",
+      prompt: stylizedPrompt(brand, product),
+      size: "1024x1024"
     });
     const d = out?.data?.[0];
     if (d?.b64_json) return `data:image/png;base64,${d.b64_json}`;
@@ -195,6 +199,7 @@ async function generateImageUrl(brand, product) {
   return "https://placehold.co/600x600?text=No+Image";
 }
 
+/* ---------------- Pre-gen ---------------- */
 async function generateNextPick() {
   if (generatingNext) return;
   generatingNext = true;
