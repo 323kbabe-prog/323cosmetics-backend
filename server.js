@@ -156,7 +156,7 @@ function pickProductAlgorithm() {
   return pool[idx];
 }
 
-/* ---------------- Stylized prompt (baseline + rotation) ---------------- */
+/* ---------------- Stylized prompt (improved) ---------------- */
 function stylizedPrompt(brand, product) {
   let action = "holding the product";
   const lower = product.toLowerCase();
@@ -164,15 +164,6 @@ function stylizedPrompt(brand, product) {
   else if (lower.includes("mascara") || lower.includes("eye") || lower.includes("brow")) action = "applying eye makeup";
   else if (lower.includes("cream") || lower.includes("serum") || lower.includes("toner") || lower.includes("mask")) action = "applying skincare to face";
   else if (lower.includes("hair") || lower.includes("spray")) action = "using haircare product";
-
-  // 🔄 Sticker style packs (baseline first)
-  const stickerSets = [
-    "puffy hearts 💖, pastel stars ⭐, sparkles ✨, doodle flowers 🌸, shiny bubbles, neon swirls 🌀", // ✅ your original good one
-    "bows 🎀, ribbons, glitter hearts 💕, kawaii sparkles ✨, pastel confetti dots",
-    "strawberries 🍓, boba cups 🧋, candy pieces 🍬, neon doodle swirls 🌀, shiny pastel stars ✨",
-    "smiley faces 🙂, crying-but-cute 🥺, silly tongue face 😛, doodle arrows ➰, sparkly bursts ✨"
-  ];
-  const stickerPick = stickerSets[Math.floor(Math.random() * stickerSets.length)];
 
   return [
     "Create a high-impact, shareable photocard-style image.",
@@ -185,12 +176,11 @@ function stylizedPrompt(brand, product) {
     "• pastel gradient background (milk pink, baby blue, lilac)",
     "• glitter bokeh and lens glints",
     "• flash-lit glossy skin with subtle K-beauty glow",
-    `• playful small sticker shapes (${stickerPick}) floating lightly around the subject`,
+    "• sticker shapes ONLY (hearts, stars, sparkles) floating lightly",
     "• clean studio sweep look; subtle film grain"
   ].join(" ");
 }
 
-/* ---------------- Image gen ---------------- */
 async function generateImageUrl(brand, product) {
   try {
     console.log("🎨 Generating female idol image with:", brand, product);
