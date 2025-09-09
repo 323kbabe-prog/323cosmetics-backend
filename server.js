@@ -176,7 +176,7 @@ function stylizedPrompt(brand, product) {
     "• pastel gradient background (milk pink, baby blue, lilac)",
     "• glitter bokeh and lens glints",
     "• flash-lit glossy skin with subtle K-beauty glow",
-    "• sticker shapes ONLY (hearts, stars, sparkles, emoji) floating lightly",
+    "• sticker shapes ONLY (hearts, stars, sparkles, emoji, text faces, qute illustration stickers) floating lightly",
     "• clean studio sweep look; subtle film grain"
   ].join(" ");
 }
@@ -285,3 +285,4 @@ app.listen(PORT, async () => {
   console.log(`323drop live backend (female-only, TikTok Cosmetics Top 50) on :${PORT}`);
   await generateNextPick();
 });
+
