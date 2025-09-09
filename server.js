@@ -156,7 +156,7 @@ function pickProductAlgorithm() {
   return pool[idx];
 }
 
-/* ---------------- Stylized prompt (improved with rotating stickers) ---------------- */
+/* ---------------- Stylized prompt (baseline + rotation) ---------------- */
 function stylizedPrompt(brand, product) {
   let action = "holding the product";
   const lower = product.toLowerCase();
@@ -165,11 +165,11 @@ function stylizedPrompt(brand, product) {
   else if (lower.includes("cream") || lower.includes("serum") || lower.includes("toner") || lower.includes("mask")) action = "applying skincare to face";
   else if (lower.includes("hair") || lower.includes("spray")) action = "using haircare product";
 
-  // 🔄 Rotating sticker sets
+  // 🔄 Sticker style packs (baseline first)
   const stickerSets = [
-    "puffy hearts 💖, pastel stars ⭐, sparkles ✨, doodle flowers 🌸, shiny bubbles",
+    "puffy hearts 💖, pastel stars ⭐, sparkles ✨, doodle flowers 🌸, shiny bubbles, neon swirls 🌀", // ✅ your original good one
     "bows 🎀, ribbons, glitter hearts 💕, kawaii sparkles ✨, pastel confetti dots",
-    "strawberries 🍓, boba cups 🧋, candy pieces 🍬, neon swirls 🌀, shiny stars ✨",
+    "strawberries 🍓, boba cups 🧋, candy pieces 🍬, neon doodle swirls 🌀, shiny pastel stars ✨",
     "smiley faces 🙂, crying-but-cute 🥺, silly tongue face 😛, doodle arrows ➰, sparkly bursts ✨"
   ];
   const stickerPick = stickerSets[Math.floor(Math.random() * stickerSets.length)];
