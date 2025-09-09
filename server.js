@@ -176,7 +176,7 @@ function stylizedPrompt(brand, product) {
     "• pastel gradient background (milk pink, baby blue, lilac)",
     "• glitter bokeh and lens glints",
     "• flash-lit glossy skin with subtle K-beauty glow",
-    "• sticker shapes ONLY (hearts, stars, sparkles) floating lightly",
+    "• sticker shapes ONLY (hearts, stars, sparkles, emoji) floating lightly",
     "• clean studio sweep look; subtle film grain"
   ].join(" ");
 }
