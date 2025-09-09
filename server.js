@@ -166,20 +166,20 @@ function stylizedPrompt(brand, product) {
   else if (lower.includes("hair") || lower.includes("spray")) action = "using haircare product";
 
   return [
-    "Create a high-impact, shareable photocard-style image.",
-    "Subject: young female Korean idol (Gen-Z aesthetic).",
-    `She is visibly ${action}, clearly holding the ${product} by ${brand} and using it in the scene.`,
-    "The product must be obvious and actively in use, not just floating or implied.",
-    "Make an ORIGINAL idol-like face and styling; do NOT replicate real celebrities.",
-    "No text, logos, or watermarks.",
-    "Square 1:1 composition.",
-    "• pastel gradient background (milk pink, baby blue, lilac)",
-    "• glitter bokeh and lens glints",
-    "• flash-lit glossy skin with subtle K-beauty glow",
-    "• sticker shapes ONLY (hearts, stars, sparkles) floating lightly",
-    "• clean studio sweep look; subtle film grain"
-  ].join(" ");
-}
+  "Create a high-impact, shareable photocard-style image.",
+  "Subject: young female Korean idol (Gen-Z aesthetic).",
+  `She is visibly ${action}, clearly holding the ${product} by ${brand} and using it in the scene.`,
+  "The product must be obvious and actively in use, not just floating or implied.",
+  "Make an ORIGINAL idol-like face and styling; do NOT replicate real celebrities.",
+  "No text, logos, or watermarks.",
+  "Square 1:1 composition.",
+  "• pastel gradient background (milk pink, baby blue, lilac)",
+  "• glitter bokeh and lens glints",
+  "• flash-lit glossy skin with subtle K-beauty glow",
+  "• playful small sticker shapes (puffy hearts 💖, pastel stars ⭐, sparkles ✨, doodle flowers 🌸, shiny bubbles, neon swirls 🌀) floating lightly around the subject",
+  "• clean studio sweep look; subtle film grain"
+].join(" ");
+
 
 async function generateImageUrl(brand, product) {
   try {
@@ -285,3 +285,4 @@ app.listen(PORT, async () => {
   console.log(`323drop live backend (female-only, TikTok Cosmetics Top 50) on :${PORT}`);
   await generateNextPick();
 });
+
