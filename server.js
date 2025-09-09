@@ -156,7 +156,7 @@ function pickProductAlgorithm() {
   return pool[idx];
 }
 
-/* ---------------- Stylized prompt (improved) ---------------- */
+/* ---------------- Stylized prompt (improved with rotating stickers) ---------------- */
 function stylizedPrompt(brand, product) {
   let action = "holding the product";
   const lower = product.toLowerCase();
@@ -165,22 +165,32 @@ function stylizedPrompt(brand, product) {
   else if (lower.includes("cream") || lower.includes("serum") || lower.includes("toner") || lower.includes("mask")) action = "applying skincare to face";
   else if (lower.includes("hair") || lower.includes("spray")) action = "using haircare product";
 
+  // 🔄 Rotating sticker sets
+  const stickerSets = [
+    "puffy hearts 💖, pastel stars ⭐, sparkles ✨, doodle flowers 🌸, shiny bubbles",
+    "bows 🎀, ribbons, glitter hearts 💕, kawaii sparkles ✨, pastel confetti dots",
+    "strawberries 🍓, boba cups 🧋, candy pieces 🍬, neon swirls 🌀, shiny stars ✨",
+    "smiley faces 🙂, crying-but-cute 🥺, silly tongue face 😛, doodle arrows ➰, sparkly bursts ✨"
+  ];
+  const stickerPick = stickerSets[Math.floor(Math.random() * stickerSets.length)];
+
   return [
-  "Create a high-impact, shareable photocard-style image.",
-  "Subject: young female Korean idol (Gen-Z aesthetic).",
-  `She is visibly ${action}, clearly holding the ${product} by ${brand} and using it in the scene.`,
-  "The product must be obvious and actively in use, not just floating or implied.",
-  "Make an ORIGINAL idol-like face and styling; do NOT replicate real celebrities.",
-  "No text, logos, or watermarks.",
-  "Square 1:1 composition.",
-  "• pastel gradient background (milk pink, baby blue, lilac)",
-  "• glitter bokeh and lens glints",
-  "• flash-lit glossy skin with subtle K-beauty glow",
-  "• playful small sticker shapes (puffy hearts 💖, pastel stars ⭐, sparkles ✨, doodle flowers 🌸, shiny bubbles, neon swirls 🌀) floating lightly around the subject",
-  "• clean studio sweep look; subtle film grain"
-].join(" ");
+    "Create a high-impact, shareable photocard-style image.",
+    "Subject: young female Korean idol (Gen-Z aesthetic).",
+    `She is visibly ${action}, clearly holding the ${product} by ${brand} and using it in the scene.`,
+    "The product must be obvious and actively in use, not just floating or implied.",
+    "Make an ORIGINAL idol-like face and styling; do NOT replicate real celebrities.",
+    "No text, logos, or watermarks.",
+    "Square 1:1 composition.",
+    "• pastel gradient background (milk pink, baby blue, lilac)",
+    "• glitter bokeh and lens glints",
+    "• flash-lit glossy skin with subtle K-beauty glow",
+    `• playful small sticker shapes (${stickerPick}) floating lightly around the subject`,
+    "• clean studio sweep look; subtle film grain"
+  ].join(" ");
+}
 
-
+/* ---------------- Image gen ---------------- */
 async function generateImageUrl(brand, product) {
   try {
     console.log("🎨 Generating female idol image with:", brand, product);
@@ -285,4 +295,3 @@ app.listen(PORT, async () => {
   console.log(`323drop live backend (female-only, TikTok Cosmetics Top 50) on :${PORT}`);
   await generateNextPick();
 });
-
