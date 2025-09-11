@@ -1,5 +1,4 @@
 // server.js — backend for 323drop paywall
-// Node >= 20
 
 import express from "express";
 import cors from "cors";
@@ -9,11 +8,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ✅ Stripe setup
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // set in Render env vars
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 /* ---------------- CORS ---------------- */
 app.use(cors({
-  origin: ["https://1ai323.ai", "https://www.1ai323.ai"], // allow your domains
+  origin: ["https://1ai323.ai", "https://www.1ai323.ai"],
   methods: ["GET", "POST"],
   credentials: true
 }));
@@ -25,7 +24,7 @@ app.use(express.json());
 app.post("/create-checkout-session", async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"], // includes Apple Pay / Google Pay
+      payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
