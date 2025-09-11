@@ -1,18 +1,18 @@
 {
-  "name": "323cosmetics-backend",
+  "name": "323drop-backend",
   "version": "1.0.0",
-  "description": "Stripe checkout backend for 323drop",
+  "description": "323drop Live backend (Spotify Top 50 USA + Gender + Algorithm + Google TTS + OpenAI fallback)",
   "main": "server.js",
-  "type": "module",
   "scripts": {
     "start": "node server.js"
   },
-  "dependencies": {
-    "express": "^4.19.2",
-    "cors": "^2.8.5",
-    "stripe": "^14.0.0"
-  },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@google-cloud/text-to-speech": "^5.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "openai": "^4.0.0"
   }
 }
